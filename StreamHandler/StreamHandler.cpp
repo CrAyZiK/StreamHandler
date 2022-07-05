@@ -100,6 +100,7 @@ namespace StreamHandler {
 		size_t size = r_stream.size();
 
 		if (size == 0) throw median_of_empty_list_exception();
+		if (size == 1) return r_stream[0];
 		if (size % 2 == 0)  throw median_of_list_with_even_number_of_elements_exception();
 
 		size /= 2;
@@ -109,7 +110,6 @@ namespace StreamHandler {
 	}
 
 	uint8_t Processing::handmade_nth_element(std::vector<uint8_t> vec, int first, int k, int last) {
-		//if (first == last) return vec[first];
 		if (k < 0 || k >= last - first + 1) throw handmade_nth_element_k_out_of_range_exception();
 		auto i = partition(vec, first, last);
 		if (i - first == k - 1) return vec[i];
