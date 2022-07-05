@@ -88,6 +88,10 @@ namespace UnitTestForStreamHandler
 
 			Assert::ExpectException<median_of_empty_list_exception>([&r_stream] {StreamHandler::Processing::handmade_median({}); },
 				L"median_of_empty_list_exception was expected.");
+			
+			median = StreamHandler::Processing::handmade_median({11});
+			Assert::AreEqual(test_median, median,
+				L"Wrong meadian.");
 
 		}
 	};
