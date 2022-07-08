@@ -25,7 +25,6 @@ int main()
         if(r_stream.size()%2==0) r_stream.erase(r_stream.begin());
         auto median = sh.median(r_stream);
         std::cout << "\nmedian:\n" << std::to_string(median) << "\n=====================================" << std::endl;
-        sh.compute_blocks("1 s d f");
     }
     std::cout << "Hello World!\n";
 }
