@@ -15,17 +15,13 @@ namespace UnitTestForStreamHandler
 		TEST_METHOD(TestRCalculationMethods)
 		{
 			std::vector<uint8_t> test_parameters{1,2,3,4,5,8,243};
-			Assert::AreEqual(StreamHandler::Processing::sum_of_parameters(test_parameters), 
-				StreamHandler::Processing::handmade_sum_of_parameters(test_parameters),
+			Assert::AreEqual((uint8_t)10, StreamHandler::Processing::sum_of_parameters(test_parameters),
 				L"Wrong sum of parameters.");
-			Assert::AreEqual(StreamHandler::Processing::product_of_parameters(test_parameters), 
-				StreamHandler::Processing::handmade_product_of_parameters(test_parameters),
+			Assert::AreEqual((uint8_t)64, StreamHandler::Processing::product_of_parameters(test_parameters),
 				L"Wrong product of parameters.");
-			Assert::AreEqual(StreamHandler::Processing::max_of_parameters(test_parameters), 
-				StreamHandler::Processing::handmade_max_of_parameters(test_parameters),
+			Assert::AreEqual((uint8_t)243, StreamHandler::Processing::max_of_parameters(test_parameters),
 				L"Wrong max of parameters.");
-			Assert::AreEqual(StreamHandler::Processing::min_of_parameters(test_parameters), 
-				StreamHandler::Processing::handmade_min_of_parameters(test_parameters),
+			Assert::AreEqual((uint8_t)1, StreamHandler::Processing::min_of_parameters(test_parameters),
 				L"Wrong min of parameters.");
 		}
 
@@ -34,7 +30,7 @@ namespace UnitTestForStreamHandler
 			std::string test_block("1 5 6\n2 8 6 5\n3 6 7 8 7 8 9 123\n1 5 5\n1 6 5\n2 7 7 7\n3 6 7 8 7 5 5\n4 6 7 8 7 5 5");
 			std::vector<uint8_t> test_r_stream{11, 240, 123, 10, 11, 87, 8, 5};
 			uint8_t test_median = 11;
-			auto sh = StreamHandler::Processing();
+			auto sh = StreamHandler::Processing(3);
 			auto r_stream = sh.compute_blocks(test_block);
 
 			Assert::AreEqual(test_r_stream.size(), r_stream.size(), 
@@ -61,38 +57,28 @@ namespace UnitTestForStreamHandler
 		{
 			std::vector<uint8_t> r_stream{ 11, 240, 123, 10, 11, 87, 8, 5 };
 
-			Assert::ExpectException<median_of_list_with_even_number_of_elements_exception>([&r_stream] {StreamHandler::Processing::median(r_stream); },
-				L"median_of_list_with_even_number_of_elements_exception was expected.");
+			auto sh = StreamHandler::Processing(3);
 
-			r_stream = { 11, 240, 123, 10, 11, 87, 8, 5 };
-			Assert::ExpectException<median_of_list_with_even_number_of_elements_exception>([&r_stream] {StreamHandler::Processing::handmade_median(r_stream); },
-				L"median_of_list_with_even_number_of_elements_exception was expected.");
+			Assert::ExpectException<median_on_not_full_queue_exception>([&r_stream, &sh] {sh.median(); },
+				L"Median on not full queue.");
 
-			r_stream = { 240, 123, 10, 11, 87, 8, 5 };
-			uint8_t test_median = 11;
+			sh.push(r_stream);
+			auto median = sh.median();
 
-			auto median = StreamHandler::Processing::median(r_stream);
-
-			Assert::AreEqual(test_median, median,
-				L"Wrong meadian.");
-
-			r_stream = { 240, 123, 10, 11, 87, 8, 5 };
-			median = StreamHandler::Processing::handmade_median(r_stream);
-
-			Assert::AreEqual(test_median, median,
-				L"Wrong meadian.");
-
-
-			Assert::ExpectException<median_of_empty_list_exception>([&r_stream] {StreamHandler::Processing::median({}); },
-				L"median_of_empty_list_exception was expected.");
-
-			Assert::ExpectException<median_of_empty_list_exception>([&r_stream] {StreamHandler::Processing::handmade_median({}); },
-				L"median_of_empty_list_exception was expected.");
-			
-			median = StreamHandler::Processing::handmade_median({11});
-			Assert::AreEqual(test_median, median,
+			Assert::AreEqual((uint8_t)8, median,
 				L"Wrong meadian.");
 
 		}
+		TEST_METHOD(TestProcessing)
+		{
+			Assert::ExpectException<wrong_queue_size_exception>([] { auto sh = StreamHandler::Processing(1); },
+				L"Wrong queue size.");
+
+			Assert::ExpectException<wrong_queue_size_exception>([] { auto sh = StreamHandler::Processing(4); },
+				L"Wrong queue size.");
+
+			Assert::ExpectException<wrong_queue_size_exception>([] { auto sh = StreamHandler::Processing(1000002); },
+				L"Wrong queue size.");
+		};
 	};
 }
