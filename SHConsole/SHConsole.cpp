@@ -1,4 +1,4 @@
-﻿// SHConsole.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
+// SHConsole.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
 //
 
 #include <iostream>
@@ -8,25 +8,33 @@
 int main()
 {
     std::string test("1 5 6\n2 8 6 5\n3 6 7 8 7 8 9 123\n1 5 5\n1 6 5\n2 7 7 7\n3 6 7 8 7 5 5\n4 6 7 8 7 5 5");
-    std::string input = "";
     while (true) {
         std::cout << "Enter block stream, type test for default or exit:" << std::endl;
-        std::cin >> input;
+        std::string input;
+        std::string line;
+        while (std::getline(std::cin, line)) {
+            if (line == "")
+                break;
+            input += line;
+        }
+        if (*(input.end()-1) == '\n') input.erase(input.end());
         if (input.compare("exit") == 0) {
             return 0;
         }
-        auto sh = StreamHandler::Processing();
+        auto sh = StreamHandler::Processing(7);
         if (input.compare("test") == 0) {
             input = test;
         }
         auto r_stream = sh.compute_blocks(input);
         std::cout << "\nr_stream:" << std::endl;
         for (auto item : r_stream) std::cout << std::to_string(item) << std::endl;
-        if(r_stream.size()%2==0) r_stream.erase(r_stream.begin());
-        auto median = sh.median(r_stream);
-        std::cout << "\nmedian:\n" << std::to_string(median) << "\n=====================================" << std::endl;
+        sh.push(r_stream);
+        if (sh.queue_is_full()) {
+            std::cout << "\nmedian:" << std::endl;
+            auto median = sh.median();
+            std::cout << std::to_string(median) << "\n\n";
+        }
     }
-    std::cout << "Hello World!\n";
 }
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
