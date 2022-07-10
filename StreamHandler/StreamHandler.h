@@ -29,7 +29,7 @@ namespace StreamHandler
 	private:
 		int MAX_QUEUE_SIZE;
 
-		uint32_t queue_item_count[255] = {0};
+		uint32_t queue_item_count[256] = {0};
 
 		std::queue<uint8_t> queue;
 		std::map<uint8_t, std::function<uint8_t(std::vector<uint8_t>)>> rules;
